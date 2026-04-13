@@ -1,0 +1,186 @@
+/* "Persona" Inspired Vibrant UI CSS Framework */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Gradient Definitions (Ombre Blue Purple) */
+    --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    --hover-gradient: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+    
+    /* Text & BG Colors */
+    --text-main: #333333;
+    --text-muted: #777777;
+    --bg-white: #ffffff;
+    --bg-body: #f4f7f6;
+    --border-color: #e1e8ed;
+    
+    /* Nav & Accent */
+    --nav-bg: #f8fafc; /* Color for navigation bar */
+    --accent-line: #6a11cb; /* Color for stylish border line */
+
+    /* Shadows */
+    --card-shadow: 0 10px 20px rgba(0,0,0,0.05), 0 6px 6px rgba(0,0,0,0.03);
+    --btn-shadow: 0 4px 14px 0 rgba(106, 17, 203, 0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-main);
+    background-color: var(--bg-body);
+    line-height: 1.6;
+}
+
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.main-content { padding: 60px 0; }
+
+
+header {
+    background-color: var(--nav-bg); 
+    border-top: 4px solid var(--accent-line); 
+    border-bottom: 1px solid var(--border-color); 
+    padding: 15px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Grouping Logo and Left/Center Nav */
+.header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.site-logo a {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #000;
+    letter-spacing: -1px;
+}
+
+.site-nav ul { list-style: none; display: flex; gap: 25px; }
+.site-nav ul li a {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    text-transform: uppercase;
+}
+.site-nav ul li a:hover { color: #2575fc; }
+
+/* Dropdown Settings Menu */
+.dropdown { position: relative; }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--bg-white);
+    min-width: 180px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    z-index: 100;
+    right: 0;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+.dropdown-content a {
+    color: var(--text-main);
+    padding: 12px 16px;
+    display: block;
+    text-transform: none;
+}
+.dropdown-content a:hover { background-color: #f1f5f9; color: #2575fc; }
+.dropdown:hover .dropdown-content { display: block; }
+
+
+
+.logout-btn-nav {
+    border: 1px solid var(--accent-line);
+    color: var(--accent-line);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.logout-btn-nav:hover {
+    background: var(--primary-gradient);
+    color: #fff;
+    border-color: transparent;
+}
+
+
+.form-card, .order-card, .product-item {
+    background: var(--bg-white);
+    padding: 40px;
+    border-radius: 10px; /* Modern border radius */
+    box-shadow: var(--card-shadow); /* Soft shadows */
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.product-item { text-align: center; max-width: none; padding: 20px;}
+.product-item:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 30px rgba(0,0,0,0.1);}
+
+.form-group { margin-bottom: 20px; text-align: left;}
+.form-group label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 0.9rem;}
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    background: var(--bg-body);
+}
+.form-group input:focus { outline: none; border-color: #2575fc; box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.1); }
+
+
+.btn-ombre {
+    display: inline-block;
+    background: var(--primary-gradient);
+    color: var(--bg-white);
+    padding: 15px 30px;
+    border: none;
+    border-radius: 25px; /* Fully rounded 'pill' buttons like persona picture */
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    box-shadow: var(--btn-shadow); /* Shadow on buttons */
+    width: 100%;
+    text-align: center;
+}
+.btn-ombre:hover {
+    background: var(--hover-gradient);
+    box-shadow: 0 6px 20px 0 rgba(106, 17, 203, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-back { margin-bottom: 30px; font-weight: 500; display: inline-block; color: #6a11cb; }
+.btn-back:before { content: '← '; }
+
+
+.table-stylish { width: 100%; border-collapse: collapse; margin-top: 30px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: var(--card-shadow);}
+.table-stylish th { text-align: left; padding: 20px; background-color: var(--nav-bg); border-bottom: 2px solid var(--border-color); font-weight: 600; text-transform: uppercase; font-size: 0.8rem;}
+.table-stylish td { padding: 20px; border-bottom: 1px solid var(--border-color); }
+.qty-input { width: 70px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; text-align: center; margin-right: 5px;}
+
+
+.btn-table {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(106, 17, 203, 0.2);
+}
+.btn-remove {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); /* Red gradient for remove */
+    box-shadow: 0 2px 5px rgba(255, 75, 43, 0.2);
+}
+.btn-remove:hover {
+    box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
+}
