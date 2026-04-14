@@ -75,7 +75,7 @@ $products = $stmt->fetchAll();
     <title>Tech Shop</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Specific tweaks for the new Search and Header layout */
+        /* Search and Header layout */
         .search-box {
             background: #fff; padding: 20px; border-radius: 10px; box-shadow: var(--card-shadow);
             margin-bottom: 40px; text-align: center;
