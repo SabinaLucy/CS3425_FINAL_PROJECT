@@ -2,7 +2,7 @@
 session_start();
 
 function connectDB() {
-    $config = parse_ini_file("/local/my_web_files/slbimbi/db.ini"); 
+    $config = parse_ini_file("/local/my_web_files/jujordan/db.ini"); 
     
     try {
         $dbh = new PDO($config['dsn'], $config['username'], $config['password']);

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($new_pass === $confirm_pass) {
         $new_hash = hash('sha256', $new_pass);
         
-        // Update password and clear the requires_password_reset flag based on your schema
+        // Update password and clear the requires_password_reset flag
         $update = $dbh->prepare("UPDATE EMPLOYEE SET password_hash = :hash, requires_password_reset = 0 WHERE employee_id = :id");
         $update->execute([':hash' => $new_hash, ':id' => $emp_id]);
         

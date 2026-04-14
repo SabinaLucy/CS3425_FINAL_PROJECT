@@ -43,7 +43,7 @@ $product_metadata = [
         'description' => 'The marathon runner of gaming headsets, legendary for its industry-leading 300-hour battery life. One charge literally lasts for weeks of gaming.'
     ],
     
-    // Peripherals (Addresses the "Keyboard is not a keyboard" matching issue)
+    // Peripherals
     1008 => [
         'img' => 'images/1008.webp', 
         'alt_img' => 'images/1008_alt.jpg',
