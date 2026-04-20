@@ -135,7 +135,7 @@ $products = $stmt->fetchAll();
                     <?php foreach ($products as $product): ?>
                         <div class="product-item">
                             <?php 
-                                // Matches your previous metadata logic for images
+                            
                                 $img_src = isset($product_metadata[$product['product_id']]['img']) ? $product_metadata[$product['product_id']]['img'] : "images/" . $product['product_id'] . ".jpg"; 
                             ?>
                             <a href="product_detail.php?id=<?php echo $product['product_id']; ?>">
