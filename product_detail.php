@@ -1,18 +1,22 @@
 <?php
 require "db.php";
-require "products_data.php"; // Bring in the descriptions and alternate images!
+require "products_data.php"; 
 $dbh = connectDB();
 
-if (!isset($_SESSION['customer_id'])) {
-    header("Location: login.php");
-    exit();
-}
+// Allow guests to view, but track login status 
+$is_logged_in = isset($_SESSION['customer_id']);
+$username = $is_logged_in ? htmlspecialchars($_SESSION['username']) : "Guest";
 
-$username = htmlspecialchars($_SESSION['username']);
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $msg = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
+    // Redirect to login if a guest tries to add to cart
+    if (!$is_logged_in) {
+        header("Location: login.php");
+        exit();
+    }
+    
     $qty = (int)$_POST['quantity'];
     
     $stmt = $dbh->prepare("SELECT price, stock_qty FROM PRODUCT WHERE product_id = :pid");
@@ -73,10 +77,14 @@ $meta = isset($product_metadata[$product_id]) ? $product_metadata[$product_id] :
                 <h3 style="margin-bottom: 10px; color: var(--text-main);">Welcome <span style="color: var(--accent-line);"><?php echo $username; ?></span> !!</h3>
                 
                 <ul class="top-nav-links">
-                    <li><a href="orders.php">View Orders</a></li>
-                    <li><a href="cart.php">Shopping Cart</a></li>
-                    <li><a href="change_password.php">Change Password</a></li>
-                    <li><a href="login.php?action=logout" style="color: #dc3545;">Logout</a></li>
+                    <?php if ($is_logged_in): ?>
+                       <li><a href="orders.php">View Orders</a></li>
+                       <li><a href="cart.php">Shopping Cart</a></li>
+                       <li><a href="change_password.php">Change Password</a></li>
+                       <li><a href="login.php?action=logout" style="color: #dc3545;">Logout</a></li>
+                    <?php else: ?>
+                       <li><a href="login.php" class="btn-ombre" style="padding: 8px 25px; text-decoration: none;">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

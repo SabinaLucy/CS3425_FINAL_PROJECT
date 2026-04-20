@@ -5,23 +5,30 @@ $dbh = connectDB();
 if (!isset($_SESSION['employee_id'])) { header("Location: employee_login.php"); exit(); }
 $emp_username = htmlspecialchars($_SESSION['emp_username']);
 
-// Fetch Stock History from unified PRODUCT_HISTORY table
-$stock_history = $dbh->query("
-    SELECT h.*, p.name 
-    FROM PRODUCT_HISTORY h 
-    JOIN PRODUCT p ON h.product_id = p.product_id 
-    WHERE h.old_stock IS NOT NULL AND h.new_stock IS NOT NULL
-    ORDER BY h.timestamp DESC
-")->fetchAll();
+// Get all products for the dropdown
+$products = $dbh->query("SELECT product_id, name FROM PRODUCT")->fetchAll();
 
-// Fetch Price History from unified PRODUCT_HISTORY table
-$price_history = $dbh->query("
-    SELECT h.*, p.name 
-    FROM PRODUCT_HISTORY h 
-    JOIN PRODUCT p ON h.product_id = p.product_id 
-    WHERE h.old_price IS NOT NULL AND h.new_price IS NOT NULL
-    ORDER BY h.timestamp DESC
-")->fetchAll();
+// Check if a specific product was selected
+$selected_product = isset($_GET['product_id']) ? $_GET['product_id'] : '';
+$where_clause_stock = "WHERE h.old_stock IS NOT NULL AND h.new_stock IS NOT NULL";
+$where_clause_price = "WHERE h.old_price IS NOT NULL AND h.new_price IS NOT NULL";
+
+$params = [];
+if ($selected_product !== '') {
+    $where_clause_stock .= " AND h.product_id = :pid";
+    $where_clause_price .= " AND h.product_id = :pid";
+    $params[':pid'] = $selected_product;
+}
+
+// Fetch Stock History
+$stmt_stock = $dbh->prepare("SELECT h.*, p.name FROM PRODUCT_HISTORY h JOIN PRODUCT p ON h.product_id = p.product_id $where_clause_stock ORDER BY h.timestamp DESC");
+$stmt_stock->execute($params);
+$stock_history = $stmt_stock->fetchAll();
+
+// Fetch Price History
+$stmt_price = $dbh->prepare("SELECT h.*, p.name FROM PRODUCT_HISTORY h JOIN PRODUCT p ON h.product_id = p.product_id $where_clause_price ORDER BY h.timestamp DESC");
+$stmt_price->execute($params);
+$price_history = $stmt_price->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +62,22 @@ $price_history = $dbh->query("
 
     <div class="main-content">
         <div class="container">
-            <a href="employee_index.php" class="btn-ombre" style="display: inline-block; margin-bottom: 20px; padding: 8px 15px; text-decoration: none;">&larr; Back to Dashboard</a>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <a href="employee_index.php" class="btn-ombre" style="padding: 8px 15px; text-decoration: none;">&larr; Back to Dashboard</a>
+                
+                <form method="get" action="emp_history.php" style="display: flex; gap: 10px; align-items: center;">
+                    <label style="font-weight: bold;">Filter by Product:</label>
+                    <select name="product_id" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="">-- All Products --</option>
+                        <?php foreach($products as $p): ?>
+                            <option value="<?php echo $p['product_id']; ?>" <?php if($selected_product == $p['product_id']) echo 'selected'; ?>>
+                                <?php echo htmlspecialchars($p['name']); ?> (ID: <?php echo $p['product_id']; ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="submit" class="btn-ombre" style="padding: 8px 15px;">View Item</button>
+                </form>
+            </div>
             
             <h2 style="margin-bottom: 20px; text-transform: uppercase;">Price History</h2>
             <table class="simple-table">
@@ -113,7 +135,6 @@ $price_history = $dbh->query("
                     <?php endif; ?>
                 </tbody>
             </table>
-
         </div>
     </div>
 </body>

@@ -1,24 +1,27 @@
 <?php
 require "db.php";
-require "products_data.php";
+require "products_data.php"; 
 $dbh = connectDB();
 
-if (!isset($_SESSION['customer_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-$username = htmlspecialchars($_SESSION['username']);
+// --- 1. SESSION & GUEST CHECK ---
+$is_logged_in = isset($_SESSION['customer_id']);
+$username = $is_logged_in ? htmlspecialchars($_SESSION['username']) : "Guest";
 $msg = "";
 
-// 1. Fetch Categories for the Search Dropdown
+// 2. Fetch Categories for the Search Dropdown
 $cat_stmt = $dbh->query("SELECT category_id, category_name FROM CATEGORY");
 $categories = $cat_stmt->fetchAll();
 
-// 2. Handle Quick Add to Cart
+// 3. Handle Quick Add to Cart
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
+    // REQUIREMENT: Redirect to login if a guest tries to add to cart
+    if (!$is_logged_in) {
+        header("Location: login.php");
+        exit();
+    }
+
     $product_id = $_POST['product_id'];
-    $quantity = 1; // Default quick add quantity
+    $quantity = 1; 
     
     $stmt = $dbh->prepare("SELECT price, stock_qty FROM PRODUCT WHERE product_id = :pid");
     $stmt->execute([':pid' => $product_id]);
@@ -45,11 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
     }
 }
 
-// 3. Handle Search Logic (Category and/or Device Name)
+// 4. Handle Search Logic
 $search_category = $_GET['category'] ?? '';
 $search_term = $_GET['device_name'] ?? '';
 
-// Build the dynamic SQL query based on user input
 $sql = "SELECT p.*, c.category_name FROM PRODUCT p JOIN CATEGORY c ON p.category_id = c.category_id WHERE 1=1";
 $params = [];
 
@@ -65,7 +67,6 @@ if (!empty(trim($search_term))) {
 $stmt = $dbh->prepare($sql);
 $stmt->execute($params);
 $products = $stmt->fetchAll();
-
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +76,6 @@ $products = $stmt->fetchAll();
     <title>Tech Shop</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Specific tweaks for the new Search and Header layout */
         .search-box {
             background: #fff; padding: 20px; border-radius: 10px; box-shadow: var(--card-shadow);
             margin-bottom: 40px; text-align: center;
@@ -84,7 +84,6 @@ $products = $stmt->fetchAll();
         .search-input { padding: 12px 20px; border: 1px solid var(--border-color); border-radius: 25px; outline: none; font-family: inherit;}
         .top-nav-links { list-style: none; display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-end;}
         .top-nav-links a { font-weight: 600; color: var(--accent-line); font-size: 0.95rem; }
-        .top-nav-links a:hover { color: #2575fc; }
     </style>
 </head>
 <body>
@@ -96,10 +95,14 @@ $products = $stmt->fetchAll();
                 <h3 style="margin-bottom: 10px; color: var(--text-main);">Welcome <span style="color: var(--accent-line);"><?php echo $username; ?></span> !!</h3>
                 
                 <ul class="top-nav-links">
-                    <li><a href="orders.php">View Orders</a></li>
-                    <li><a href="cart.php">Shopping Cart</a></li>
-                    <li><a href="change_password.php">Change Password</a></li>
-                    <li><a href="login.php?action=logout" style="color: #dc3545;">Logout</a></li>
+                    <?php if ($is_logged_in): ?>
+                        <li><a href="orders.php">View Orders</a></li>
+                        <li><a href="cart.php">Shopping Cart</a></li>
+                        <li><a href="change_password.php">Change Password</a></li>
+                        <li><a href="login.php?action=logout" style="color: #dc3545;">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="login.php" class="btn-ombre" style="padding: 8px 25px; text-decoration: none;">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -107,7 +110,6 @@ $products = $stmt->fetchAll();
 
     <div class="main-content">
         <div class="container">
-            
             <div class="search-box">
                 <form method="GET" action="index.php" class="search-form">
                     <select name="category" class="search-input" style="width: 200px;">
@@ -133,14 +135,14 @@ $products = $stmt->fetchAll();
                     <?php foreach ($products as $product): ?>
                         <div class="product-item">
                             <?php 
-
-    $img_src = isset($product_metadata[$product['product_id']]['img']) ? $product_metadata[$product['product_id']]['img'] : "images/" . $product['product_id'] . ".jpg"; 
-?>
-<a href="product_detail.php?id=<?php echo $product['product_id']; ?>">
-    <img src="<?php echo $img_src; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" 
-         onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400.png?text=No+Image';" 
-         style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-</a>
+                                // Matches your previous metadata logic for images
+                                $img_src = isset($product_metadata[$product['product_id']]['img']) ? $product_metadata[$product['product_id']]['img'] : "images/" . $product['product_id'] . ".jpg"; 
+                            ?>
+                            <a href="product_detail.php?id=<?php echo $product['product_id']; ?>">
+                                <img src="<?php echo $img_src; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" 
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400.png?text=No+Image';" 
+                                     style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                            </a>
                             
                             <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 5px;"><?php echo htmlspecialchars($product['category_name']); ?></p>
                             <h3 style="margin-bottom: 10px; font-size: 1.1rem;"><?php echo htmlspecialchars($product['name']); ?></h3>
